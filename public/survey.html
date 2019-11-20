@@ -156,25 +156,25 @@
         <h3><strong>Question 9</strong></h3>
         <h4>You think that everyone’s views should be respected regardless of whether they are supported by facts or
             not.</h4>
-            <a class="chosen-single chosen-default"><span>Select an Option</span>
-                <div><b></b></div>
-            </a>
-            <select class="chosen-select" id="q9">
-                <option value=""></option>
-                <option value="1">1 (Strongly Disagree)</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5 (Strongly Agree)</option>
-            </select>
-            <br><br>
+        <a class="chosen-single chosen-default"><span>Select an Option</span>
+            <div><b></b></div>
+        </a>
+        <select class="chosen-select" id="q9">
+            <option value=""></option>
+            <option value="1">1 (Strongly Disagree)</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5 (Strongly Agree)</option>
+        </select>
+        <br><br>
 
         <h3><strong>Question 10</strong></h3>
         <h4>You feel more energetic after spending time with a group of people.</h4>
         <a class="chosen-single chosen-default"><span>Select an Option</span>
             <div><b></b></div>
         </a>
-        <select class="chosen-select" id="q10   ">
+        <select class="chosen-select" id="q10">
             <option value=""></option>
             <option value="1">1 (Strongly Disagree)</option>
             <option value="2">2</option>
@@ -187,68 +187,99 @@
         <br>
 
         <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit"><i class="fa fa-check-circle"
+        <button type="submit" class="btn btn-primary btn-lg btn-block" id="submitBtn"><i class="fa fa-check-circle"
                 aria-hidden="true"></i>
             Submit</button>
 
-        <hr>
-        <footer class="footer">
-            <div class="container">
-                <p><a href="/api/friends">API Friends List</a> | <a
-                        href="https://github.com/afhaque/friendfinder">GitHub Repo</a></p>
+
+        <!-- Modal after survey completion -->
+        <div id="bestFriendModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h3 class="modal-title">Your New Best Friend</h1>
+                    </div>
+                    <div class="modal-body">
+                        <h2 id="bestFriend"></h2>
+                        <img id="bestFriendPhoto" src="#">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
             </div>
-        </footer>
+        </div>
+    </div>
+
+    <hr>
+    <footer class="footer">
+        <div class="container">
+            <p><a href="/api/friends">API Friends List</a> | <a href="https://github.com/afhaque/friendfinder">GitHub
+                    Repo</a></p>
+        </div>
+    </footer>
 
     </div>
 
-    <script type="text/javascript">
-    $("#submit").on("click", function(event) {
-        event.preventDefault();
-        
-        function validation(){
-            //if form is not filled out info will not push to array
-            var validForm = true;
-            $(".form-control").each(function(){
-                if($(this).val() === ""){
-                    validForm = false;
-                }
-            })
-            return validForm;
-        }
-
-        if(validation()){
-            var newFriend = {
-                name: $("#name").val().trim(),
-                photo: $("#photo").val().trim(),
-                scores: [
-                    $("#q1").val(),
-                    $("#q2").val(),
-                    $("#q3").val(),
-                    $("#q4").val(),
-                    $("#q5").val(),
-                    $("#q6").val(),
-                    $("#q7").val(),
-                    $("#q8").val(),
-                    $("#q9").val(),
-                    $("#q10").val(),
-                ]
-            };
-
-        
-            $.post("/api/friends", newFriend, function(data){
-                
-            })
-
-        }
     
-    
-    
-    
-    </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    
+    <script type="text/javascript">
+        $("#submitBtn").on("click", function (event) {
+            event.preventDefault();
+
+            function validation() {
+                //if form is not filled out info will not push to array
+                var validForm = true;
+                $(".form-control, .select").each(function(){
+                    if ($(this).val() === "empty") {
+                        validForm = false;
+                    }
+                });
+                return validForm;
+            };
+
+            if(validation() === true) {
+                var newFriend = {
+                    name: $("#name").val().trim(),
+                    photo: $("#photo").val().trim(),
+                    scores: [
+                        $("#q1").val(),
+                        $("#q2").val(),
+                        $("#q3").val(),
+                        $("#q4").val(),
+                        $("#q5").val(),
+                        $("#q6").val(),
+                        $("#q7").val(),
+                        $("#q8").val(),
+                        $("#q9").val(),
+                        $("#q10").val(),
+                    ]
+                }
+                $.post("/api/friends", newFriend, function (data) {
+                    $("#bestFriend").text(data.name);
+                    $("#bestFriendPhoto").attr("src", data.photo);
+                    $("#bestFriendModal").modal("toggle");
+                });
+
+                //clearing fields
+                $("#name, #photo, #q1, #q2, #q3, #q4, #q5, #q6, #q7, #q8, #q9, #q10").val("");
+            } else {
+                // If a required field is missing, show alert
+                alert("Survey is incomplete!");
+            };
+
+
+
+        });
+
+    </script>
+
+
 </body>
 
 </html>
